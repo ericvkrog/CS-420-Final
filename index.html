@@ -14,16 +14,16 @@
     --border: #2a2a40;
     --text: #e8e8f0;
     --muted: #6b6b90;
-    --blue:   #4a9eff;
-    --green:  #3ddc84;
-    --yellow: #ffd166;
-    --purple: #c084fc;
-    --red:    #ff6b6b;
-    --blue-bg:   rgba(74,158,255,0.08);
-    --green-bg:  rgba(61,220,132,0.08);
-    --yellow-bg: rgba(255,209,102,0.08);
-    --purple-bg: rgba(192,132,252,0.08);
-    --red-bg:    rgba(255,107,107,0.08);
+    --blue:   #4FC1FF;
+    --green:  #6ADB6A;
+    --yellow: #FFD700;
+    --purple: #C586C0;
+    --red:    #F47068;
+    --blue-bg:   rgba(79,193,255,0.08);
+    --green-bg:  rgba(106,219,106,0.08);
+    --yellow-bg: rgba(255,215,0,0.08);
+    --purple-bg: rgba(197,134,192,0.08);
+    --red-bg:    rgba(244,112,104,0.08);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -124,11 +124,11 @@
     letter-spacing: 0.5px;
   }
   .chip-dot { width: 10px; height: 10px; border-radius: 50%; }
-  .chip-blue   { color:var(--blue);   border-color:rgba(74,158,255,0.3);   background:var(--blue-bg); }
-  .chip-green  { color:var(--green);  border-color:rgba(61,220,132,0.3);   background:var(--green-bg); }
-  .chip-yellow { color:var(--yellow); border-color:rgba(255,209,102,0.3);  background:var(--yellow-bg); }
-  .chip-purple { color:var(--purple); border-color:rgba(192,132,252,0.3);  background:var(--purple-bg); }
-  .chip-red    { color:var(--red);    border-color:rgba(255,107,107,0.3);  background:var(--red-bg); }
+  .chip-blue   { color:var(--blue);   border-color:rgba(79,193,255,0.3);   background:var(--blue-bg); }
+  .chip-green  { color:var(--green);  border-color:rgba(106,219,106,0.3);  background:var(--green-bg); }
+  .chip-yellow { color:var(--yellow); border-color:rgba(255,215,0,0.3);    background:var(--yellow-bg); }
+  .chip-purple { color:var(--purple); border-color:rgba(197,134,192,0.3);  background:var(--purple-bg); }
+  .chip-red    { color:var(--red);    border-color:rgba(244,112,104,0.3);  background:var(--red-bg); }
 
   .header-btns {
     display: flex;
@@ -206,16 +206,16 @@
     top: 0; left: 0; right: 0;
     height: 3px;
   }
-  .phil-card.blue::before   { background: var(--blue);   border-color: rgba(74,158,255,0.3); }
+  .phil-card.blue::before   { background: var(--blue); }
   .phil-card.green::before  { background: var(--green);  }
   .phil-card.yellow::before { background: var(--yellow); }
   .phil-card.purple::before { background: var(--purple); }
   .phil-card.red::before    { background: var(--red);    }
-  .phil-card:hover.blue   { border-color: rgba(74,158,255,0.4); }
-  .phil-card:hover.green  { border-color: rgba(61,220,132,0.4); }
-  .phil-card:hover.yellow { border-color: rgba(255,209,102,0.4); }
-  .phil-card:hover.purple { border-color: rgba(192,132,252,0.4); }
-  .phil-card:hover.red    { border-color: rgba(255,107,107,0.4); }
+  .phil-card:hover.blue   { border-color: rgba(79,193,255,0.4); }
+  .phil-card:hover.green  { border-color: rgba(106,219,106,0.4); }
+  .phil-card:hover.yellow { border-color: rgba(255,215,0,0.4); }
+  .phil-card:hover.purple { border-color: rgba(197,134,192,0.4); }
+  .phil-card:hover.red    { border-color: rgba(244,112,104,0.4); }
 
   .phil-tag {
     font-family: 'DM Mono', monospace;
@@ -334,15 +334,16 @@
     min-height: 360px;
   }
 
-  /* color highlighting */
+  /* color highlighting — matches VSCode extension tokenColorCustomizations */
   .cc-blue   { color: var(--blue);   }
   .cc-green  { color: var(--green);  }
   .cc-yellow { color: var(--yellow); }
   .cc-purple { color: var(--purple); }
   .cc-red    { color: var(--red);    }
   .cc-comment { color: var(--muted); font-style: italic; }
+  .cc-content { color: var(--text); }
   .cc-tag {
-    font-weight: 500;
+    font-weight: bold;   /* VSCode: fontStyle "bold" */
     border-radius: 3px;
     padding: 0 4px;
     margin-right: 4px;
@@ -548,6 +549,12 @@
   .syntax-table tr:hover td { background: var(--surface); }
   .syntax-table .role { font-size: 12px; color: var(--muted); }
   .syntax-table .example-code { font-size: 12px; }
+  .syntax-table tbody tr { border-left: 3px solid transparent; }
+  .syntax-table tbody tr:nth-child(1) { border-left-color: var(--blue); }
+  .syntax-table tbody tr:nth-child(2) { border-left-color: var(--green); }
+  .syntax-table tbody tr:nth-child(3) { border-left-color: var(--yellow); }
+  .syntax-table tbody tr:nth-child(4) { border-left-color: var(--purple); }
+  .syntax-table tbody tr:nth-child(5) { border-left-color: var(--red); }
 
   code {
     font-family: 'DM Mono', monospace;
@@ -601,6 +608,136 @@
     section { padding: 60px 20px; }
     header { padding: 80px 20px 60px; }
   }
+
+  /* ── ColorTypeError box ── */
+  .cte-box {
+    border: 1px solid rgba(244,112,104,0.4);
+    border-left: 3px solid var(--red);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: rgba(244,112,104,0.06);
+  }
+  .cte-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: var(--red);
+    background: rgba(244,112,104,0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+    align-self: flex-start;
+  }
+  .cte-msg {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: #ffaaaa;
+    line-height: 1.6;
+  }
+
+  /* ── Stats strip ── */
+  .stats-strip {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 20px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--blue), var(--green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── How It Works ── */
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+  }
+  .how-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    position: relative;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .how-card:hover { transform: translateY(-2px); border-color: var(--muted); }
+  .how-step {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .how-card h3 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+  .how-card p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* ── Hero code card ── */
+  .hero-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 56px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .hero-left  { flex: 1; min-width: 0; }
+  .hero-right { flex: 0 0 360px; }
+  @media (max-width: 880px) {
+    .hero-right { display: none; }
+    .hero-left  { text-align: center; }
+    .color-chips, .header-btns { justify-content: center; }
+  }
+  .hero-code-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+  }
+  .hero-code-titlebar {
+    background: var(--surface2);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-code-body {
+    padding: 16px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.9;
+  }
 </style>
 </head>
 <body>
@@ -608,6 +745,7 @@
 <nav class="nav">
   <div class="nav-logo">ChromaCode</div>
   <ul class="nav-links">
+    <li><a href="#how">How It Works</a></li>
     <li><a href="#playground">Playground</a></li>
     <li><a href="#examples">Examples</a></li>
     <li><a href="#syntax">Syntax</a></li>
@@ -623,22 +761,87 @@
     <div class="orb orb-3"></div>
   </div>
   <div class="color-bar"></div>
-  <div class="logo">
-    <span class="chroma">Chroma</span><span class="code-word">Code</span>
-  </div>
-  <p class="tagline">A programming language where color is syntax, not decoration.</p>
-  <div class="color-chips">
-    <div class="chip chip-blue">  <div class="chip-dot" style="background:var(--blue)"></div>  BLUE — variables</div>
-    <div class="chip chip-green"> <div class="chip-dot" style="background:var(--green)"></div> GREEN — functions</div>
-    <div class="chip chip-yellow"><div class="chip-dot" style="background:var(--yellow)"></div>YELLOW — conditions</div>
-    <div class="chip chip-purple"><div class="chip-dot" style="background:var(--purple)"></div>PURPLE — loops</div>
-    <div class="chip chip-red">   <div class="chip-dot" style="background:var(--red)"></div>   RED — end / stop</div>
-  </div>
-  <div class="header-btns">
-    <a href="#playground" class="btn btn-primary">Try It Live</a>
-    <a href="https://github.com" class="btn btn-ghost" target="_blank">View on GitHub</a>
+
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="logo">
+        <span class="chroma">Chroma</span><span class="code-word">Code</span>
+      </div>
+      <p class="tagline">A programming language where color is syntax, not decoration.</p>
+      <div class="color-chips">
+        <div class="chip chip-blue">  <div class="chip-dot" style="background:var(--blue)"></div>  BLUE — variables</div>
+        <div class="chip chip-green"> <div class="chip-dot" style="background:var(--green)"></div> GREEN — functions</div>
+        <div class="chip chip-yellow"><div class="chip-dot" style="background:var(--yellow)"></div>YELLOW — conditions</div>
+        <div class="chip chip-purple"><div class="chip-dot" style="background:var(--purple)"></div>PURPLE — loops</div>
+        <div class="chip chip-red">   <div class="chip-dot" style="background:var(--red)"></div>   RED — end / stop</div>
+      </div>
+      <div class="header-btns">
+        <a href="#playground" class="btn btn-primary">Try It Live</a>
+        <a href="#syntax" class="btn btn-ghost">View Syntax</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-code-card">
+        <div class="hero-code-titlebar">
+          <div class="ide-dots">
+            <div class="ide-dot dot-red"></div>
+            <div class="ide-dot dot-yellow"></div>
+            <div class="ide-dot dot-green"></div>
+          </div>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">fizzbuzz.chroma</span>
+        </div>
+        <div class="hero-code-body" id="hero-preview"></div>
+      </div>
+    </div>
   </div>
 </header>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <span class="stat-num">5</span>
+    <span class="stat-label">Color Roles</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">1</span>
+    <span class="stat-label">Language</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">.chroma</span>
+    <span class="stat-label">File Extension</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">0ms</span>
+    <span class="stat-label">Setup Required</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">// Overview</div>
+  <h2>How ChromaCode Works</h2>
+  <p style="color:var(--muted); max-width:600px">
+    Color isn't decoration — it's the grammar. Every line is prefixed with a color tag that tells the interpreter exactly what kind of operation follows.
+  </p>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-step">01</div>
+      <h3>Write in Color</h3>
+      <p>Start every line with a color tag — <span style="color:var(--blue)">BLUE</span>, <span style="color:var(--green)">GREEN</span>, <span style="color:var(--yellow)">YELLOW</span>, <span style="color:var(--purple)">PURPLE</span>, or <span style="color:var(--red)">RED</span>. The tag defines what the line does before the text is even read.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-step">02</div>
+      <h3>Validate at Parse Time</h3>
+      <p>If you use the wrong color for a construct — say <span style="color:var(--blue)">BLUE</span> for a print statement — the parser raises a <code>ColorTypeError</code> immediately, telling you which color to use instead.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-step">03</div>
+      <h3>Execute</h3>
+      <p>The interpreter walks the AST and runs the program. Functions, loops, conditions, and variables all behave as you'd expect — just with color as the structural backbone.</p>
+    </div>
+  </div>
+</section>
 
 <!-- PLAYGROUND -->
 <section id="playground">
@@ -672,6 +875,7 @@ YELLOW if name != &quot;&quot;
 GREEN print(&quot;Hello, &quot; + name)"></textarea>
         <div class="ide-controls">
           <button class="run-btn" onclick="runCode()">▶ Run</button>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.5px">⌘↵ to run</span>
           <button class="sample-btn" onclick="loadSample('hello')">Hello World</button>
           <button class="sample-btn" onclick="loadSample('fizzbuzz')">FizzBuzz</button>
           <button class="sample-btn" onclick="loadSample('prime')">Primes</button>
@@ -839,6 +1043,27 @@ GREEN print(&quot;Hello, &quot; + name)"></textarea>
 
 const VALID_COLORS = new Set(['BLUE','GREEN','YELLOW','PURPLE','RED']);
 
+const COLOR_ROLES = {
+  BLUE:   'variable assignment / data',
+  GREEN:  'function definition / print / return',
+  YELLOW: 'condition (if / elif / else)',
+  PURPLE: 'loop (for / while)',
+  RED:    'end block / stop',
+};
+
+function suggestColor(text) {
+  const t = text.trim();
+  if (/^print\s*\(/.test(t))                              return 'GREEN';
+  if (/^func\s+\w+/.test(t))                              return 'GREEN';
+  if (/^return\b/.test(t))                                return 'GREEN';
+  if (/^(if|elif)\s+/.test(t) || /^else:?$/.test(t))     return 'YELLOW';
+  if (/^for\s+\w+\s+in\s+/.test(t) || /^while\s+/.test(t)) return 'PURPLE';
+  if (/^end$/.test(t))                                    return 'RED';
+  if (/^\w+\s*=[^=]/.test(t))                             return 'BLUE';
+  if (/^\w+\s*\(/.test(t))                                return 'GREEN';
+  return null;
+}
+
 class ChromaToken {
   constructor(color, text, lineno) {
     this.color = color; this.text = text; this.lineno = lineno;
@@ -847,7 +1072,13 @@ class ChromaToken {
 
 class ColorTypeError extends Error {
   constructor(color, text, lineno) {
-    super(`ColorTypeError line ${lineno}: ${color} cannot be used for '${text}'`);
+    const suggestion = suggestColor(text);
+    let msg = `ColorTypeError line ${lineno}: ${color} cannot be used for '${text}' (${color} is for ${COLOR_ROLES[color] || 'unknown'})`;
+    if (suggestion && suggestion !== color) {
+      msg += ` — did you mean ${suggestion} (${COLOR_ROLES[suggestion]})?`;
+    }
+    super(msg);
+    this.name = 'ColorTypeError';
   }
 }
 
@@ -892,11 +1123,22 @@ class Parser {
 
   parse(){ return this._parseBlock(true); }
 
+  _validateRed(tok) {
+    const t = tok.text.trim();
+    if (t && t !== 'end') throw new ColorTypeError('RED', tok.text, tok.lineno);
+  }
+
+  _consumeRed() {
+    const tok = this.peek();
+    if (tok && tok.color === 'RED') { this._validateRed(tok); this.consume(); }
+  }
+
   _parseBlock(topLevel=false, ifBody=false) {
     const nodes = [];
     while (this.pos < this.tokens.length) {
       const tok = this.peek();
       if (tok.color === 'RED') {
+        this._validateRed(tok);
         if (topLevel) this.consume();
         break;
       }
@@ -916,14 +1158,14 @@ class Parser {
     if (color === 'GREEN')  { this.consume(); return this._parseGreen(text, lineno); }
     if (color === 'YELLOW') { return this._parseYellow(); }
     if (color === 'PURPLE') { this.consume(); return this._parsePurple(text, lineno); }
-    if (color === 'RED')    { this.consume(); return null; }
+    if (color === 'RED')    { this._validateRed(tok); this.consume(); return null; }
     throw new Error(`Line ${lineno}: Unexpected`);
   }
 
   _parseBlue(text, lineno) {
-    const eq = text.indexOf('=');
-    if (eq === -1) throw new ColorTypeError('BLUE', text, lineno);
-    return new AssignNode(text.slice(0,eq).trim(), text.slice(eq+1).trim(), lineno);
+    const m = text.match(/^(\w+)\s*=(?!=)\s*(.*)$/);
+    if (!m) throw new ColorTypeError('BLUE', text, lineno);
+    return new AssignNode(m[1], m[2].trim(), lineno);
   }
 
   _parseGreen(text, lineno) {
@@ -934,7 +1176,7 @@ class Parser {
       const name = funcM[1];
       const params = funcM[2].split(',').map(p=>p.trim()).filter(Boolean);
       const body = this._parseBlock();
-      if (this.peek() && this.peek().color === 'RED') this.consume();
+      this._consumeRed();
       return new FuncDefNode(name, params, body, lineno);
     }
     if (text.startsWith('return')) {
@@ -974,13 +1216,13 @@ class Parser {
     const forM = text.match(/^for\s+(\w+)\s+in\s+(-?\d+|\w+)\.\.(-?\d+|\w+)/);
     if (forM) {
       const body = this._parseBlock();
-      if (this.peek() && this.peek().color === 'RED') this.consume();
+      this._consumeRed();
       return new ForNode(forM[1], forM[2], forM[3], body, lineno);
     }
     const whileM = text.match(/^while\s+(.+)/);
     if (whileM) {
       const body = this._parseBlock();
-      if (this.peek() && this.peek().color === 'RED') this.consume();
+      this._consumeRed();
       return new WhileNode(whileM[1].replace(/:$/,'').trim(), body, lineno);
     }
     throw new ColorTypeError('PURPLE', text, lineno);
@@ -1125,7 +1367,7 @@ function highlight(source) {
     const color = tag.toUpperCase();
     if (!VALID_COLORS.has(color)) return `<span style="color:var(--red)">${escHtml(rawLine)}</span>`;
     const cls = color.toLowerCase();
-    return `<span class="cc-tag cc-tag-${cls}">${escHtml(tag)}</span><span class="cc-${cls}">${escHtml(rest)}</span>`;
+    return `<span class="cc-tag cc-tag-${cls}">${escHtml(tag)}</span><span class="cc-content">${escHtml(rest)}</span>`;
   }).join('\n');
 }
 
@@ -1179,7 +1421,16 @@ function runCode() {
       ).join('\n');
     }
   } catch(e) {
-    outputPanel.innerHTML = `<span class="output-error">❌ ${escHtml(e.message)}</span>`;
+    if (e instanceof ColorTypeError) {
+      const body = escHtml(e.message.replace(/^ColorTypeError /, ''));
+      outputPanel.innerHTML =
+        `<div class="cte-box">` +
+          `<span class="cte-badge">ColorTypeError</span>` +
+          `<span class="cte-msg">${body}</span>` +
+        `</div>`;
+    } else {
+      outputPanel.innerHTML = `<span class="output-error">❌ ${escHtml(e.message)}</span>`;
+    }
   }
 }
 
@@ -1351,6 +1602,22 @@ EXAMPLE_CARDS.forEach(card => {
   }
   grid.appendChild(el);
 });
+
+// ── Hero code preview ──
+const HERO_SNIPPET = `// FizzBuzz in ChromaCode
+GREEN print("FizzBuzz 1–15")
+PURPLE for i in 1..15
+YELLOW if i % 15 === 0
+GREEN print("FizzBuzz")
+YELLOW elif i % 3 === 0
+GREEN print("Fizz")
+YELLOW elif i % 5 === 0
+GREEN print("Buzz")
+YELLOW else
+GREEN print(str(i))
+RED end`;
+
+document.getElementById('hero-preview').innerHTML = highlight(HERO_SNIPPET);
 
 // Load hello world on start
 loadSample('hello');

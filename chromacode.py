@@ -32,12 +32,16 @@ class ChromaToken:
 
 
 class ColorTypeError(Exception):
-    def __init__(self, color, expected, lineno):
-        super().__init__(
+    def __init__(self, color, text, lineno):
+        suggestion = _suggest_color(text)
+        msg = (
             f"ColorTypeError on line {lineno}: "
-            f"color {color} cannot be used for '{expected}'. "
-            f"Expected color role: {_color_role(color)}"
+            f"{color} cannot be used for '{text}' "
+            f"({color} is for {_color_role(color)})"
         )
+        if suggestion and suggestion != color:
+            msg += f" — did you mean {suggestion} ({_color_role(suggestion)})?"
+        super().__init__(msg)
 
 def _color_role(color):
     roles = {
@@ -48,6 +52,28 @@ def _color_role(color):
         "RED":    "end block / stop",
     }
     return roles.get(color, "unknown")
+
+
+def _suggest_color(text: str):
+    """Infer the correct color tag from the construct text."""
+    t = text.strip()
+    if re.match(r'print\s*\(', t):
+        return "GREEN"
+    if re.match(r'func\s+\w+', t):
+        return "GREEN"
+    if re.match(r'return\b', t):
+        return "GREEN"
+    if re.match(r'(if|elif)\s+', t) or re.fullmatch(r'else:?', t):
+        return "YELLOW"
+    if re.match(r'for\s+\w+\s+in\s+', t) or re.match(r'while\s+', t):
+        return "PURPLE"
+    if re.fullmatch(r'end', t):
+        return "RED"
+    if re.match(r'\w+\s*=', t) and not re.match(r'\w+\s*==', t):
+        return "BLUE"
+    if re.match(r'\w+\s*\(', t):
+        return "GREEN"
+    return None
 
 
 def lex(source: str) -> list[ChromaToken]:
@@ -143,23 +169,30 @@ class Parser:
     def parse(self):
         return self._parse_block(top_level=True)
 
+    def _validate_red(self, tok):
+        t = tok.text.strip()
+        if t and t != "end":
+            raise ColorTypeError("RED", tok.text, tok.lineno)
+
+    def _consume_red(self):
+        if self.peek() and self.peek().color == "RED":
+            self._validate_red(self.peek())
+            self.consume()
+
     def _parse_block(self, top_level=False, if_body=False):
         nodes = []
         while self.pos < len(self.tokens):
             tok = self.peek()
-            # RED ends a block
             if tok.color == "RED":
+                self._validate_red(tok)
                 if top_level:
                     self.consume()
                 break
-            # YELLOW elif/else ends a sub-block (let _parse_yellow handle them)
             if tok.color == "YELLOW" and (
                 tok.text.startswith("elif ") or
                 tok.text in ("else", "else:")
             ):
                 break
-            # When parsing an if/elif/else body, stop at PURPLE (loops) or new YELLOW if
-            # so loops aren't accidentally captured inside an if branch
             if if_body and tok.color in ("PURPLE",):
                 break
             if if_body and tok.color == "YELLOW" and tok.text.startswith("if "):
@@ -185,43 +218,38 @@ class Parser:
             self.consume()
             return self._parse_purple(text, lineno)
         elif color == "RED":
+            self._validate_red(tok)
             self.consume()
-            return None  # end sentinel
+            return None
         else:
             self.consume()
             raise SyntaxError(f"Line {lineno}: Unexpected token {tok}")
 
     def _parse_blue(self, text, lineno):
-        """BLUE: variable assignment — e.g. 'x = 42' or 'name = "World"'"""
-        if "=" not in text:
+        m = re.match(r'^(\w+)\s*=(?!=)\s*(.*)$', text)
+        if not m:
             raise ColorTypeError("BLUE", text, lineno)
-        lhs, _, rhs = text.partition("=")
-        return AssignNode(lhs.strip(), rhs.strip(), lineno)
+        return AssignNode(m.group(1), m.group(2).strip(), lineno)
 
     def _parse_green(self, text, lineno):
-        """GREEN: print, func def, return, or function call."""
         if text.startswith("print(") or text.startswith("print ("):
             inner = re.match(r'print\s*\((.+)\)', text)
             if inner:
                 return PrintNode(inner.group(1).strip(), lineno)
             raise SyntaxError(f"Line {lineno}: Malformed print statement: {text!r}")
         elif text.startswith("func "):
-            # func name(params) — body follows until RED end
             m = re.match(r'func\s+(\w+)\s*\(([^)]*)\)', text)
             if not m:
                 raise SyntaxError(f"Line {lineno}: Malformed func definition: {text!r}")
             name = m.group(1)
             params = [p.strip() for p in m.group(2).split(",") if p.strip()]
             body = self._parse_block()
-            # consume RED end
-            if self.peek() and self.peek().color == "RED":
-                self.consume()
+            self._consume_red()
             return FuncDefNode(name, params, body, lineno)
         elif text.startswith("return ") or text == "return":
             expr = text[7:].strip() if text.startswith("return ") else ""
             return ReturnNode(expr, lineno)
         elif re.match(r'\w+\s*\(', text):
-            # function call as a statement
             return FuncCallNode(text, lineno)
         else:
             raise ColorTypeError("GREEN", text, lineno)
@@ -254,28 +282,18 @@ class Parser:
         return IfNode(branches, else_body, lineno)
 
     def _parse_purple(self, text, lineno):
-        """PURPLE: for loop or while loop."""
-        # for i in 1..100  (bounds can be integers OR variable names)
         m_for = re.match(r'for\s+(\w+)\s+in\s+(-?\d+|\w+)\.\.(-?\d+|\w+)', text)
         if m_for:
-            var = m_for.group(1)
-            start = m_for.group(2)
-            end = m_for.group(3)
             body = self._parse_block()
-            if self.peek() and self.peek().color == "RED":
-                self.consume()
-            return ForNode(var, start, end, body, lineno)
+            self._consume_red()
+            return ForNode(m_for.group(1), m_for.group(2), m_for.group(3), body, lineno)
 
-        # for i in range(...)
         m_range = re.match(r'for\s+(\w+)\s+in\s+range\((.+)\)', text)
         if m_range:
             var = m_range.group(1)
-            range_args = m_range.group(2)
             body = self._parse_block()
-            if self.peek() and self.peek().color == "RED":
-                self.consume()
-            # Expand range(...) into start..end
-            parts = [p.strip() for p in range_args.split(",")]
+            self._consume_red()
+            parts = [p.strip() for p in m_range.group(2).split(",")]
             if len(parts) == 1:
                 start, end = "0", str(int(parts[0]) - 1)
             elif len(parts) == 2:
@@ -284,14 +302,11 @@ class Parser:
                 raise SyntaxError(f"Line {lineno}: range() takes 1-2 args")
             return ForNode(var, start, end, body, lineno)
 
-        # while condition
         m_while = re.match(r'while\s+(.+)', text)
         if m_while:
-            cond = m_while.group(1).rstrip(":")
             body = self._parse_block()
-            if self.peek() and self.peek().color == "RED":
-                self.consume()
-            return WhileNode(cond, body, lineno)
+            self._consume_red()
+            return WhileNode(m_while.group(1).rstrip(":"), body, lineno)
 
         raise ColorTypeError("PURPLE", text, lineno)
 
