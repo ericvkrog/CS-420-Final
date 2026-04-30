@@ -1,0 +1,11 @@
+{
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      { "scope": "keyword.chroma.blue",   "settings": { "foreground": "#4FC1FF", "fontStyle": "bold" } },
+      { "scope": "keyword.chroma.green",  "settings": { "foreground": "#6ADB6A", "fontStyle": "bold" } },
+      { "scope": "keyword.chroma.yellow", "settings": { "foreground": "#FFD700", "fontStyle": "bold" } },
+      { "scope": "keyword.chroma.purple", "settings": { "foreground": "#C586C0", "fontStyle": "bold" } },
+      { "scope": "keyword.chroma.red",    "settings": { "foreground": "#F47068", "fontStyle": "bold" } }
+    ]
+  }
+}

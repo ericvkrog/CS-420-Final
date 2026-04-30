@@ -1,0 +1,54 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "ChromaCode",
+  "scopeName": "source.chroma",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#blue-line" },
+    { "include": "#green-line" },
+    { "include": "#yellow-line" },
+    { "include": "#purple-line" },
+    { "include": "#red-line" }
+  ],
+  "repository": {
+    "comment": {
+      "match": "//.*$",
+      "name": "comment.line.double-slash.chroma"
+    },
+    "blue-line": {
+      "match": "(?i)^(BLUE)\\b(.*)$",
+      "captures": {
+        "1": { "name": "keyword.chroma.blue" },
+        "2": { "name": "meta.chroma.blue.content" }
+      }
+    },
+    "green-line": {
+      "match": "(?i)^(GREEN)\\b(.*)$",
+      "captures": {
+        "1": { "name": "keyword.chroma.green" },
+        "2": { "name": "meta.chroma.green.content" }
+      }
+    },
+    "yellow-line": {
+      "match": "(?i)^(YELLOW)\\b(.*)$",
+      "captures": {
+        "1": { "name": "keyword.chroma.yellow" },
+        "2": { "name": "meta.chroma.yellow.content" }
+      }
+    },
+    "purple-line": {
+      "match": "(?i)^(PURPLE)\\b(.*)$",
+      "captures": {
+        "1": { "name": "keyword.chroma.purple" },
+        "2": { "name": "meta.chroma.purple.content" }
+      }
+    },
+    "red-line": {
+      "match": "(?i)^(RED)\\b(.*)$",
+      "captures": {
+        "1": { "name": "keyword.chroma.red" },
+        "2": { "name": "meta.chroma.red.content" }
+      }
+    }
+  }
+}

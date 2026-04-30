@@ -1,0 +1,25 @@
+{
+  "name": "chromacode-syntax",
+  "displayName": "ChromaCode Syntax",
+  "description": "Syntax highlighting for .chroma files",
+  "version": "1.0.0",
+  "engines": { "vscode": "^1.60.0" },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "chromacode",
+        "aliases": ["ChromaCode", "chroma"],
+        "extensions": [".chroma"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "chromacode",
+        "scopeName": "source.chroma",
+        "path": "./syntaxes/chromacode.tmLanguage.json"
+      }
+    ]
+  }
+}
