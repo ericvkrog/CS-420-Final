@@ -1,0 +1,28 @@
+// ChromaCode — temp_converter.chroma
+// Simple Program 2: Temperature Converter
+// Demonstrates: BLUE (variables), GREEN (func def + print), RED (end)
+
+// Define a function to convert Celsius to Fahrenheit
+GREEN func celsius_to_fahrenheit(c)
+BLUE result = c * 9 / 5 + 32
+GREEN return result
+RED end
+
+// Define a function to convert Fahrenheit to Celsius
+GREEN func fahrenheit_to_celsius(f)
+BLUE result = (f - 32) * 5 / 9
+GREEN return result
+RED end
+
+// Run some conversions
+BLUE boiling_c = 100
+BLUE boiling_f = celsius_to_fahrenheit(boiling_c)
+GREEN print("Boiling point: " + str(boiling_c) + "C = " + str(boiling_f) + "F")
+
+BLUE freezing_c = 0
+BLUE freezing_f = celsius_to_fahrenheit(freezing_c)
+GREEN print("Freezing point: " + str(freezing_c) + "C = " + str(freezing_f) + "F")
+
+BLUE body_temp_f = 98.6
+BLUE body_temp_c = fahrenheit_to_celsius(body_temp_f)
+GREEN print("Body temp: " + str(body_temp_f) + "F = " + str(round(body_temp_c, 2)) + "C")

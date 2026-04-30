@@ -1,0 +1,16 @@
+// ChromaCode — fizzbuzz.chroma
+// FizzBuzz: Classic programming challenge
+// Demonstrates: PURPLE (for loop), YELLOW (if/elif/else), GREEN (print), RED (end)
+
+GREEN print("--- FizzBuzz 1 to 30 ---")
+
+PURPLE for i in 1..30
+YELLOW if i % 15 == 0
+GREEN print("FizzBuzz")
+YELLOW elif i % 3 == 0
+GREEN print("Fizz")
+YELLOW elif i % 5 == 0
+GREEN print("Buzz")
+YELLOW else
+GREEN print(str(i))
+RED end

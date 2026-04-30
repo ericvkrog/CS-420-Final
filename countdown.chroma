@@ -1,0 +1,13 @@
+// ChromaCode — countdown.chroma
+// Simple Program 3: Countdown
+// Demonstrates: BLUE (variable), PURPLE (while loop), GREEN (print), RED (end)
+
+BLUE count = 10
+GREEN print("Countdown begins!")
+
+PURPLE while count > 0
+GREEN print(str(count) + "...")
+BLUE count = count - 1
+RED end
+
+GREEN print("Blastoff! ChromaCode is GO.")
