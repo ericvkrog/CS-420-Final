@@ -335,6 +335,8 @@ class ChromaInterpreter:
             "round": round,
             "range": range,
             "list": list,
+            "input": input,
+            "set_at": lambda arr, idx, val: arr[:idx] + [val] + arr[idx+1:],
             "True": True,
             "False": False,
             "None": None,
