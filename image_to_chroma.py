@@ -100,12 +100,12 @@ def generate_skeleton(colors: list[str]) -> str:
     var_count = 0
 
     def pad():
-        return "    " * indent
+        return "  " * indent
 
     for color in colors:
         if color == "RED":
             indent = max(0, indent - 1)
-            lines.append(f"{pad()}RED")
+            lines.append(f"{pad()}RED end")
             yellow_state = None
 
         elif color == "PURPLE":
