@@ -2,6 +2,15 @@
 
 > A programming language where **color is syntax**, not decoration.
 
+## Install VS Code Syntax Highlighting
+
+Open VS Code, go to Extensions, click the `...` menu, choose **Install from VSIX...**, then select:
+
+`chromacode-syntax/chromacode-syntax-1.0.0.vsix`
+
+Restart VS Code and open any `.chroma` file.
+
+
 ## Run Sample Programs
 
 ```bash
