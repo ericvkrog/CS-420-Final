@@ -6,42 +6,42 @@
 
 // Sum all values from 1 to n
 GREEN func sum_to(n)
-BLUE total = 0
-PURPLE for i in 1..n
-BLUE total = total + i
-RED end
-GREEN return total
+  BLUE total = 0
+  PURPLE for i in 1..n
+    BLUE total = total + i
+  RED end
+  GREEN return total
 RED end
 
 // Compute factorial
 GREEN func factorial(n)
-BLUE result = 1
-PURPLE for i in 1..n
-BLUE result = result * i
-RED end
-GREEN return result
+  BLUE result = 1
+  PURPLE for i in 1..n
+    BLUE result = result * i
+  RED end
+  GREEN return result
 RED end
 
 // Compute power: base^exp
 GREEN func power(base, exp)
-BLUE result = 1
-PURPLE for i in 1..exp
-BLUE result = result * base
-RED end
-GREEN return result
+  BLUE result = 1
+  PURPLE for i in 1..exp
+    BLUE result = result * base
+  RED end
+  GREEN return result
 RED end
 
 // Check if a number is prime (returns 1 for prime, 0 for not prime)
 GREEN func is_prime(n)
-YELLOW if n < 2
-GREEN return 0
-PURPLE for i in 2..n
-YELLOW if i * i > n
-GREEN return 1
-YELLOW elif n % i == 0
-GREEN return 0
-RED end
-GREEN return 1
+  YELLOW if n < 2
+    GREEN return 0
+  PURPLE for i in 2..n
+    YELLOW if i * i > n
+      GREEN return 1
+    YELLOW elif n % i == 0
+      GREEN return 0
+  RED end
+  GREEN return 1
 RED end
 
 // ── Main Program ──────────────────────────────────────
@@ -59,16 +59,16 @@ GREEN print("Sum of 1 to " + str(n) + " = " + str(s))
 GREEN print("")
 GREEN print("Factorials:")
 PURPLE for i in 1..7
-BLUE f = factorial(i)
-GREEN print(str(i) + "! = " + str(f))
+  BLUE f = factorial(i)
+  GREEN print(str(i) + "! = " + str(f))
 RED end
 
 // Powers of 2
 GREEN print("")
 GREEN print("Powers of 2:")
 PURPLE for i in 1..10
-BLUE p = power(2, i)
-GREEN print("2^" + str(i) + " = " + str(p))
+  BLUE p = power(2, i)
+  GREEN print("2^" + str(i) + " = " + str(p))
 RED end
 
 // Prime numbers up to 30
@@ -76,9 +76,9 @@ GREEN print("")
 GREEN print("Prime numbers up to 30:")
 BLUE primes = ""
 PURPLE for i in 2..30
-BLUE check = is_prime(i)
-YELLOW if check == 1
-BLUE primes = primes + str(i) + " "
+  BLUE check = is_prime(i)
+  YELLOW if check == 1
+    BLUE primes = primes + str(i) + " "
 RED end
 GREEN print(primes)
 

@@ -4,5 +4,5 @@
 
 BLUE name = "World"
 YELLOW if name != ""
-GREEN print("Hello, " + name + "!")
+  GREEN print("Hello, " + name + "!")
 GREEN print("Welcome to ChromaCode.")

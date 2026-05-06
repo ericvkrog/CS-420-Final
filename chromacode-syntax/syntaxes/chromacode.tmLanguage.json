@@ -16,38 +16,38 @@
       "name": "comment.line.double-slash.chroma"
     },
     "blue-line": {
-      "match": "(?i)^(BLUE)\\b(.*)$",
+      "match": "(?i)^(\\s*)(BLUE)\\b(.*)$",
       "captures": {
-        "1": { "name": "keyword.chroma.blue" },
-        "2": { "name": "meta.chroma.blue.content" }
+        "2": { "name": "keyword.chroma.blue" },
+        "3": { "name": "meta.chroma.blue.content" }
       }
     },
     "green-line": {
-      "match": "(?i)^(GREEN)\\b(.*)$",
+      "match": "(?i)^(\\s*)(GREEN)\\b(.*)$",
       "captures": {
-        "1": { "name": "keyword.chroma.green" },
-        "2": { "name": "meta.chroma.green.content" }
+        "2": { "name": "keyword.chroma.green" },
+        "3": { "name": "meta.chroma.green.content" }
       }
     },
     "yellow-line": {
-      "match": "(?i)^(YELLOW)\\b(.*)$",
+      "match": "(?i)^(\\s*)(YELLOW)\\b(.*)$",
       "captures": {
-        "1": { "name": "keyword.chroma.yellow" },
-        "2": { "name": "meta.chroma.yellow.content" }
+        "2": { "name": "keyword.chroma.yellow" },
+        "3": { "name": "meta.chroma.yellow.content" }
       }
     },
     "purple-line": {
-      "match": "(?i)^(PURPLE)\\b(.*)$",
+      "match": "(?i)^(\\s*)(PURPLE)\\b(.*)$",
       "captures": {
-        "1": { "name": "keyword.chroma.purple" },
-        "2": { "name": "meta.chroma.purple.content" }
+        "2": { "name": "keyword.chroma.purple" },
+        "3": { "name": "meta.chroma.purple.content" }
       }
     },
     "red-line": {
-      "match": "(?i)^(RED)\\b(.*)$",
+      "match": "(?i)^(\\s*)(RED)\\b(.*)$",
       "captures": {
-        "1": { "name": "keyword.chroma.red" },
-        "2": { "name": "meta.chroma.red.content" }
+        "2": { "name": "keyword.chroma.red" },
+        "3": { "name": "meta.chroma.red.content" }
       }
     }
   }

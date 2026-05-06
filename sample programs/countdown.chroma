@@ -6,8 +6,8 @@ BLUE count = 10
 GREEN print("Countdown begins!")
 
 PURPLE while count > 0
-GREEN print(str(count) + "...")
-BLUE count = count - 1
+  GREEN print(str(count) + "...")
+  BLUE count = count - 1
 RED end
 
 GREEN print("Blastoff! ChromaCode is GO.")

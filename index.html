@@ -274,8 +274,22 @@
     height: 440px;
   }
 
+  #ide.step-mode .ide-body {
+    height: 640px;
+  }
+
+  #ide.step-mode .ide-highlight {
+    flex: 0 1 42%;
+    max-height: 260px;
+  }
+
+  #ide.step-mode #output-panel {
+    flex: 1 1 58%;
+  }
+
   @media (max-width: 700px) {
-    .ide-body { grid-template-columns: 1fr; }
+    .ide-body { grid-template-columns: 1fr; height: 760px; }
+    #ide.step-mode .ide-body { height: 900px; }
   }
 
   .ide-panel {
@@ -407,6 +421,10 @@
     color: var(--green);
     white-space: pre-wrap;
     overflow: auto;
+  }
+
+  #output-panel.step-output-mode {
+    white-space: normal;
   }
 
   .output-prompt { color: var(--muted); }
@@ -741,7 +759,8 @@
     display: flex;
     flex-direction: column;
     gap: 0;
-    height: 100%;
+    min-height: 100%;
+    white-space: normal;
   }
   .step-nav {
     display: flex;
@@ -781,9 +800,8 @@
     font-size: 12px;
     border-bottom: 1px solid var(--border);
     background: rgba(79,193,255,0.04);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
   .step-action::before { content: '→ '; color: var(--blue); }
   .step-action-done { background: rgba(106,219,106,0.04); }
@@ -816,6 +834,8 @@
     color: var(--green);
     white-space: pre-wrap;
     line-height: 1.7;
+    max-height: 180px;
+    overflow: auto;
   }
   .step-btn {
     background: transparent;
@@ -1293,7 +1313,7 @@
         <textarea id="code-editor" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="// Write ChromaCode here...
 BLUE name = &quot;World&quot;
 YELLOW if name != &quot;&quot;
-GREEN print(&quot;Hello, &quot; + name)"></textarea>
+  GREEN print(&quot;Hello, &quot; + name)"></textarea>
         <div class="ide-controls">
           <button class="run-btn" onclick="runCode()">▶ Run</button>
           <button class="step-btn" id="step-btn" onclick="stepCode()">↳ Step</button>
@@ -1588,7 +1608,7 @@ class AssignNode { constructor(name,expr,l){this.name=name;this.expr=expr;this.l
 class PrintNode  { constructor(expr,l){this.expr=expr;this.lineno=l;} }
 class FuncDefNode{ constructor(name,params,body,l){this.name=name;this.params=params;this.body=body;this.lineno=l;} }
 class ReturnNode { constructor(expr,l){this.expr=expr;this.lineno=l;} }
-class IfNode     { constructor(branches,elseBody,l){this.branches=branches;this.elseBody=elseBody;this.lineno=l;} }
+class IfNode     { constructor(branches,elseBody,l,elseLine=null){this.branches=branches;this.elseBody=elseBody;this.lineno=l;this.elseLine=elseLine;} }
 class ForNode    { constructor(v,s,e,body,l){this.var=v;this.start=s;this.end=e;this.body=body;this.lineno=l;} }
 class WhileNode  { constructor(cond,body,l){this.condition=cond;this.body=body;this.lineno=l;} }
 class FuncCallNode{ constructor(expr,l){this.expr=expr;this.lineno=l;} }
@@ -1674,19 +1694,20 @@ class Parser {
       if (text.startsWith('if ')) {
         const cond = text.slice(3).replace(/:$/, '').trim();
         const body = this._parseBlock(false, true);
-        branches.push([cond, body]);
+        branches.push({ cond, body, lineno: tok.lineno, label: 'if' });
       } else if (text.startsWith('elif ')) {
         const cond = text.slice(5).replace(/:$/, '').trim();
         const body = this._parseBlock(false, true);
-        branches.push([cond, body]);
+        branches.push({ cond, body, lineno: tok.lineno, label: 'elif' });
       } else if (text === 'else' || text === 'else:') {
         elseBody = this._parseBlock(false, true);
+        var elseLine = tok.lineno;
         break;
       } else {
         throw new ColorTypeError('YELLOW', text, tok.lineno);
       }
     }
-    return new IfNode(branches, elseBody, lineno);
+    return new IfNode(branches, elseBody, lineno, elseLine || null);
   }
 
   _parsePurple(text, lineno) {
@@ -1802,7 +1823,9 @@ class ChromaInterpreter {
       return new ReturnSignal(val);
     }
     else if (node instanceof IfNode) {
-      for (const [cond, body] of node.branches) {
+      for (const branch of node.branches) {
+        const cond = branch.cond ?? branch[0];
+        const body = branch.body ?? branch[1];
         if (await this._eval(cond, env, node.lineno)) {
           const ret = await this.run(body, env);
           if (ret instanceof ReturnSignal) return ret;
@@ -2026,12 +2049,41 @@ function submitInlineInput() {
 const editor = document.getElementById('code-editor');
 const highlightPanel = document.getElementById('highlighted-panel');
 const outputPanel = document.getElementById('output-panel');
+const ideShell = document.getElementById('ide');
+
+function setStepMode(active) {
+  ideShell?.classList.toggle('step-mode', active);
+  outputPanel?.classList.toggle('step-output-mode', active);
+}
+
+function isTicTacToeProgram(source) {
+  return /Tic-Tac-Toe|GREEN func wins\(b,\s*m\)|BLUE board\s*=\s*\['1','2','3'/.test(source || '');
+}
+
+function updateStepAvailability() {
+  const stepBtn = document.getElementById('step-btn');
+  if (!stepBtn || stepTrace !== null) return;
+
+  if (isTicTacToeProgram(editor.value)) {
+    stepBtn.disabled = true;
+    stepBtn.style.opacity = '0.4';
+    stepBtn.textContent = '↳ Step';
+    stepBtn.title = 'Tic-Tac-Toe uses live input, so use Run instead.';
+  } else {
+    stepBtn.disabled = false;
+    stepBtn.style.opacity = '1';
+    stepBtn.textContent = '↳ Step';
+    stepBtn.title = '';
+  }
+}
 
 editor.addEventListener('input', () => {
   const src = editor.value;
+  if (stepTrace !== null && isTicTacToeProgram(src)) resetStep();
   highlightPanel.innerHTML = highlight(src) || '<span style="color:var(--muted)">// Start typing...</span>';
   const lines = src.split('\n').filter(l => l.trim()).length;
   document.getElementById('line-count').textContent = lines + ' line' + (lines !== 1 ? 's' : '');
+  updateStepAvailability();
 });
 
 editor.addEventListener('keydown', e => {
@@ -2050,6 +2102,7 @@ editor.addEventListener('keydown', e => {
 
 async function runCode() {
   if (stepTrace !== null) resetStep();
+  setStepMode(false);
   const src = editor.value;
   outputPanel.innerHTML = '';
   let errorLine = null;
@@ -2091,6 +2144,7 @@ async function runCode() {
 
 function clearOutput() {
   if (stepTrace !== null) resetStep();
+  setStepMode(false);
   outputPanel.innerHTML = '<span class="output-prompt">// Output cleared.</span>';
 }
 
@@ -2111,7 +2165,7 @@ function describeNode(node) {
   if (node instanceof PrintNode)    return `print(${node.expr})`;
   if (node instanceof FuncDefNode)  return `define func ${node.name}(${node.params.join(', ')})`;
   if (node instanceof ReturnNode)   return `return ${node.expr || ''}`;
-  if (node instanceof IfNode)       return node.branches.length ? `if ${node.branches[0][0]}` : 'if/else';
+  if (node instanceof IfNode)       return node.branches.length ? `if ${node.branches[0].cond}` : 'if/else';
   if (node instanceof ForNode)      return `for ${node.var} in ${node.start}..${node.end}`;
   if (node instanceof WhileNode)    return `while ${node.condition}`;
   if (node instanceof FuncCallNode) return `call ${node.expr}`;
@@ -2132,18 +2186,92 @@ async function buildTrace(source) {
   const steps = [];
   const outputLines = [];
   const interp = new ChromaInterpreter(line => outputLines.push(line));
-  const origExec = ChromaInterpreter.prototype._exec;
 
-  interp._exec = async function(node, env) {
+  const snapshot = env => Object.assign({}, getUserVars(Object.assign({}, interp.globalEnv, env)));
+  const record = (node, env, description = describeNode(node), lineno = node?.lineno) => {
     if (node && node.lineno != null) {
       steps.push({
-        lineno: node.lineno,
-        description: describeNode(node),
-        vars: Object.assign({}, getUserVars(Object.assign({}, this.globalEnv, env))),
+        lineno,
+        description,
+        vars: snapshot(env),
         output: [...outputLines],
       });
     }
-    return await origExec.call(this, node, env);
+  };
+
+  interp._exec = async function(node, env) {
+    if (node instanceof AssignNode) {
+      const val = await this._eval(node.expr, env, node.lineno);
+      env[node.name] = val;
+      record(node, env, `${node.name} = ${safeSerialize(val)}`);
+    }
+    else if (node instanceof PrintNode) {
+      const val = await this._eval(node.expr, env, node.lineno);
+      const s = val === null ? 'None' : String(val);
+      this.outputFn(s);
+      record(node, env, `print -> ${safeSerialize(s)}`);
+    }
+    else if (node instanceof FuncDefNode) {
+      const interpRef = this;
+      const closure = Object.assign({}, env);
+      const fn = async (...args) => {
+        const local = Object.assign({}, closure);
+        if (args.length !== node.params.length) throw new Error(`Expected ${node.params.length} args, got ${args.length}`);
+        node.params.forEach((p, i) => local[p] = args[i]);
+        const ret = await interpRef.run(node.body, local);
+        if (ret instanceof ReturnSignal) return ret.value;
+        return null;
+      };
+      env[node.name] = fn;
+      this.globalEnv[node.name] = fn;
+      record(node, env, `defined function ${node.name}(${node.params.join(', ')})`);
+    }
+    else if (node instanceof ReturnNode) {
+      const val = node.expr ? await this._eval(node.expr, env, node.lineno) : null;
+      record(node, env, `return ${safeSerialize(val)}`);
+      return new ReturnSignal(val);
+    }
+    else if (node instanceof IfNode) {
+      for (const branch of node.branches) {
+        const passed = await this._eval(branch.cond, env, branch.lineno);
+        record(node, env, `${branch.label} ${branch.cond} -> ${passed ? 'true' : 'false'}`, branch.lineno);
+        if (passed) {
+          const ret = await this.run(branch.body, env);
+          if (ret instanceof ReturnSignal) return ret;
+          return null;
+        }
+      }
+      if (node.elseBody) {
+        record(node, env, 'else -> true', node.elseLine || node.lineno);
+        const ret = await this.run(node.elseBody, env);
+        if (ret instanceof ReturnSignal) return ret;
+      }
+    }
+    else if (node instanceof ForNode) {
+      const start = Math.trunc(Number(await this._eval(String(node.start), env, node.lineno)));
+      const end   = Math.trunc(Number(await this._eval(String(node.end),   env, node.lineno)));
+      record(node, env, `for ${node.var} in ${start}..${end}`);
+      for (let i = start; i <= end; i++) {
+        env[node.var] = i;
+        record(node, env, `${node.var} = ${i}`, node.lineno);
+        const ret = await this.run(node.body, env);
+        if (ret instanceof ReturnSignal) return ret;
+      }
+    }
+    else if (node instanceof WhileNode) {
+      let guard = 0;
+      while (await this._eval(node.condition, env, node.lineno) && guard++ < 10000) {
+        record(node, env, `while ${node.condition} -> true`);
+        const ret = await this.run(node.body, env);
+        if (ret instanceof ReturnSignal) return ret;
+      }
+      record(node, env, `while ${node.condition} -> false`);
+    }
+    else if (node instanceof FuncCallNode) {
+      await this._eval(node.expr, env, node.lineno);
+      record(node, env);
+    }
+    return null;
   };
 
   try {
@@ -2164,6 +2292,13 @@ let stepIndex = 0;
 async function stepCode() {
   const stepBtn   = document.getElementById('step-btn');
   const resetBtn  = document.getElementById('step-reset');
+
+  if (isTicTacToeProgram(editor.value)) {
+    if (stepTrace !== null) resetStep();
+    updateStepAvailability();
+    outputPanel.innerHTML = '<span class="output-prompt">// Tic-Tac-Toe uses live input. Press Run to play it.</span>';
+    return;
+  }
 
   if (stepTrace === null) {
     const src = editor.value.trim();
@@ -2193,15 +2328,18 @@ async function stepCode() {
 function resetStep() {
   stepTrace = null;
   stepIndex = 0;
+  setStepMode(false);
   const stepBtn  = document.getElementById('step-btn');
   const resetBtn = document.getElementById('step-reset');
   if (stepBtn)  { stepBtn.textContent = '↳ Step'; stepBtn.disabled = false; stepBtn.style.opacity = '1'; }
   if (resetBtn) resetBtn.style.display = 'none';
   outputPanel.innerHTML = '<span class="output-prompt">// Press Run to execute</span>';
   highlightPanel.innerHTML = highlight(editor.value) || '<span style="color:var(--muted)">// Start typing...</span>';
+  updateStepAvailability();
 }
 
 function _renderStep() {
+  setStepMode(true);
   const step  = stepTrace[stepIndex];
   const total = stepTrace.length - 1; // execution steps (excludes final done/error)
   const isLast  = stepIndex === stepTrace.length - 1;
@@ -2248,6 +2386,7 @@ function _renderStep() {
       <div class="step-output-content">${outHTML}</div>
     </div>
   </div>`;
+  outputPanel.scrollTop = 0;
 
   // Disable Next when on last step
   const stepBtn = document.getElementById('step-btn');
@@ -2365,93 +2504,93 @@ const SAMPLES = {
   hello: `// Simple Program 1: Hello World
 BLUE name = "World"
 YELLOW if name != ""
-GREEN print("Hello, " + name + "!")
+  GREEN print("Hello, " + name + "!")
 GREEN print("Welcome to ChromaCode.")`,
 
   fizzbuzz: `// FizzBuzz — Classic Challenge
 GREEN print("--- FizzBuzz 1 to 30 ---")
 PURPLE for i in 1..30
-YELLOW if i % 15 === 0
-GREEN print("FizzBuzz")
-YELLOW elif i % 3 === 0
-GREEN print("Fizz")
-YELLOW elif i % 5 === 0
-GREEN print("Buzz")
-YELLOW else
-GREEN print(str(i))
+  YELLOW if i % 15 === 0
+    GREEN print("FizzBuzz")
+  YELLOW elif i % 3 === 0
+    GREEN print("Fizz")
+  YELLOW elif i % 5 === 0
+    GREEN print("Buzz")
+  YELLOW else
+    GREEN print(str(i))
 RED end`,
 
   prime: `// Prime Numbers up to 30
 GREEN func is_prime(n)
-YELLOW if n < 2
-GREEN return 0
-PURPLE for i in 2..n
-YELLOW if i * i > n
-GREEN return 1
-YELLOW elif n % i === 0
-GREEN return 0
-RED end
-GREEN return 1
+  YELLOW if n < 2
+    GREEN return 0
+  PURPLE for i in 2..n
+    YELLOW if i * i > n
+      GREEN return 1
+    YELLOW elif n % i === 0
+      GREEN return 0
+  RED end
+  GREEN return 1
 RED end
 GREEN print("Primes up to 30:")
 BLUE primes = ""
 PURPLE for i in 2..30
-BLUE check = is_prime(i)
-YELLOW if check === 1
-BLUE primes = primes + str(i) + " "
+  BLUE check = is_prime(i)
+  YELLOW if check === 1
+    BLUE primes = primes + str(i) + " "
 RED end
 GREEN print(primes)`,
 
   factorial: `// Factorial Calculator
 GREEN func factorial(n)
-BLUE result = 1
-PURPLE for i in 1..n
-BLUE result = result * i
-RED end
-GREEN return result
+  BLUE result = 1
+  PURPLE for i in 1..n
+    BLUE result = result * i
+  RED end
+  GREEN return result
 RED end
 GREEN print("Factorials 1-8:")
 PURPLE for i in 1..8
-BLUE f = factorial(i)
-GREEN print(str(i) + "! = " + str(f))
+  BLUE f = factorial(i)
+  GREEN print(str(i) + "! = " + str(f))
 RED end`,
 
   tictactoe: `// Tic-Tac-Toe — click a square to play
 
 GREEN func get_mark(t)
-YELLOW if t % 2 === 0
-GREEN return 'X'
-YELLOW else
-GREEN return 'O'
+  YELLOW if t % 2 === 0
+    GREEN return 'X'
+  YELLOW else
+    GREEN return 'O'
 RED end
 
 GREEN func display(b)
-GREEN print(" " + str(b[0]) + " | " + str(b[1]) + " | " + str(b[2]))
-GREEN print("---+---+---")
-GREEN print(" " + str(b[3]) + " | " + str(b[4]) + " | " + str(b[5]))
-GREEN print("---+---+---")
-GREEN print(" " + str(b[6]) + " | " + str(b[7]) + " | " + str(b[8]))
+  GREEN print(" " + str(b[0]) + " | " + str(b[1]) + " | " + str(b[2]))
+  GREEN print("---+---+---")
+  GREEN print(" " + str(b[3]) + " | " + str(b[4]) + " | " + str(b[5]))
+  GREEN print("---+---+---")
+  GREEN print(" " + str(b[6]) + " | " + str(b[7]) + " | " + str(b[8]))
 RED end
 
 GREEN func wins(b, m)
-YELLOW if b[0]===m && b[1]===m && b[2]===m
-GREEN return 1
-YELLOW elif b[3]===m && b[4]===m && b[5]===m
-GREEN return 1
-YELLOW elif b[6]===m && b[7]===m && b[8]===m
-GREEN return 1
-YELLOW elif b[0]===m && b[3]===m && b[6]===m
-GREEN return 1
-YELLOW elif b[1]===m && b[4]===m && b[7]===m
-GREEN return 1
-YELLOW elif b[2]===m && b[5]===m && b[8]===m
-GREEN return 1
-YELLOW elif b[0]===m && b[4]===m && b[8]===m
-GREEN return 1
-YELLOW elif b[2]===m && b[4]===m && b[6]===m
-GREEN return 1
-YELLOW else
-GREEN return 0
+  YELLOW if b[0]===m && b[1]===m && b[2]===m
+    GREEN return 1
+  YELLOW elif b[3]===m && b[4]===m && b[5]===m
+    GREEN return 1
+  YELLOW elif b[6]===m && b[7]===m && b[8]===m
+    GREEN return 1
+  YELLOW elif b[0]===m && b[3]===m && b[6]===m
+    GREEN return 1
+  YELLOW elif b[1]===m && b[4]===m && b[7]===m
+    GREEN return 1
+  YELLOW elif b[2]===m && b[5]===m && b[8]===m
+    GREEN return 1
+  YELLOW elif b[0]===m && b[4]===m && b[8]===m
+    GREEN return 1
+  YELLOW elif b[2]===m && b[4]===m && b[6]===m
+    GREEN return 1
+  YELLOW else
+    GREEN return 0
 RED end
 
 BLUE board = ['1','2','3','4','5','6','7','8','9']
@@ -2459,21 +2598,21 @@ BLUE turn = 0
 BLUE done = 0
 
 PURPLE while done === 0
-BLUE mark = get_mark(turn)
-GREEN display(board)
-GREEN print(mark + " — pick a square:")
-BLUE pos = int(input()) - 1
-BLUE board = set_at(board, pos, mark)
-BLUE turn = turn + 1
-BLUE w = wins(board, mark)
-YELLOW if w === 1
-GREEN display(board)
-GREEN print(mark + " wins!")
-BLUE done = 1
-YELLOW elif turn === 9
-GREEN display(board)
-GREEN print("Draw!")
-BLUE done = 1
+  BLUE mark = get_mark(turn)
+  GREEN display(board)
+  GREEN print(mark + " — pick a square:")
+  BLUE pos = int(input()) - 1
+  BLUE board = set_at(board, pos, mark)
+  BLUE turn = turn + 1
+  BLUE w = wins(board, mark)
+  YELLOW if w === 1
+    GREEN display(board)
+    GREEN print(mark + " wins!")
+    BLUE done = 1
+  YELLOW elif turn === 9
+    GREEN display(board)
+    GREEN print("Draw!")
+    BLUE done = 1
 RED end`,
 };
 
@@ -2491,7 +2630,7 @@ const EXAMPLE_CARDS = [
     desc: 'Simple Program 1',
     preview: `BLUE name = "World"
 YELLOW if name != ""
-GREEN print("Hello, " + name + "!")
+  GREEN print("Hello, " + name + "!")
 GREEN print("Welcome to ChromaCode.")`,
     sample: 'hello',
     tags: ['BLUE','YELLOW','GREEN'],
@@ -2501,8 +2640,8 @@ GREEN print("Welcome to ChromaCode.")`,
     ext: '.chroma',
     desc: 'Simple Program 2',
     preview: `GREEN func celsius_to_fahrenheit(c)
-BLUE result = c * 9 / 5 + 32
-GREEN return result
+  BLUE result = c * 9 / 5 + 32
+  GREEN return result
 RED end
 BLUE boiling_f = celsius_to_fahrenheit(100)
 GREEN print("Boiling: " + str(boiling_f) + "F")`,
@@ -2515,8 +2654,8 @@ GREEN print("Boiling: " + str(boiling_f) + "F")`,
     desc: 'Simple Program 3',
     preview: `BLUE count = 10
 PURPLE while count > 0
-GREEN print(str(count) + "...")
-BLUE count = count - 1
+  GREEN print(str(count) + "...")
+  BLUE count = count - 1
 RED end
 GREEN print("Blastoff!")`,
     sample: null,
@@ -2527,14 +2666,14 @@ GREEN print("Blastoff!")`,
     ext: '.chroma',
     desc: 'FizzBuzz Challenge',
     preview: `PURPLE for i in 1..30
-YELLOW if i % 15 === 0
-GREEN print("FizzBuzz")
-YELLOW elif i % 3 === 0
-GREEN print("Fizz")
-YELLOW elif i % 5 === 0
-GREEN print("Buzz")
-YELLOW else
-GREEN print(str(i))
+  YELLOW if i % 15 === 0
+    GREEN print("FizzBuzz")
+  YELLOW elif i % 3 === 0
+    GREEN print("Fizz")
+  YELLOW elif i % 5 === 0
+    GREEN print("Buzz")
+  YELLOW else
+    GREEN print(str(i))
 RED end`,
     sample: 'fizzbuzz',
     tags: ['PURPLE','YELLOW','GREEN','RED'],
@@ -2544,11 +2683,11 @@ RED end`,
     ext: '.chroma',
     desc: 'Complex Program — Math Suite',
     preview: `GREEN func factorial(n)
-BLUE result = 1
-PURPLE for i in 1..n
-BLUE result = result * i
-RED end
-GREEN return result
+  BLUE result = 1
+  PURPLE for i in 1..n
+    BLUE result = result * i
+  RED end
+  GREEN return result
 RED end
 // Factorials, powers, primes...`,
     sample: 'factorial',
@@ -2589,14 +2728,14 @@ EXAMPLE_CARDS.forEach(card => {
 const HERO_SNIPPET = `// FizzBuzz in ChromaCode
 GREEN print("FizzBuzz 1–15")
 PURPLE for i in 1..15
-YELLOW if i % 15 === 0
-GREEN print("FizzBuzz")
-YELLOW elif i % 3 === 0
-GREEN print("Fizz")
-YELLOW elif i % 5 === 0
-GREEN print("Buzz")
-YELLOW else
-GREEN print(str(i))
+  YELLOW if i % 15 === 0
+    GREEN print("FizzBuzz")
+  YELLOW elif i % 3 === 0
+    GREEN print("Fizz")
+  YELLOW elif i % 5 === 0
+    GREEN print("Buzz")
+  YELLOW else
+    GREEN print(str(i))
 RED end`;
 
 document.getElementById('hero-preview').innerHTML = highlight(HERO_SNIPPET);

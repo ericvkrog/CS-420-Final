@@ -1,39 +1,39 @@
 // Tic-Tac-Toe — click a square to play
 
 GREEN func get_mark(t)
-YELLOW if t % 2 == 0
-GREEN return 'X'
-YELLOW else
-GREEN return 'O'
+  YELLOW if t % 2 == 0
+    GREEN return 'X'
+  YELLOW else
+    GREEN return 'O'
 RED end
 
 GREEN func display(b)
-GREEN print(" " + str(b[0]) + " | " + str(b[1]) + " | " + str(b[2]))
-GREEN print("---+---+---")
-GREEN print(" " + str(b[3]) + " | " + str(b[4]) + " | " + str(b[5]))
-GREEN print("---+---+---")
-GREEN print(" " + str(b[6]) + " | " + str(b[7]) + " | " + str(b[8]))
+  GREEN print(" " + str(b[0]) + " | " + str(b[1]) + " | " + str(b[2]))
+  GREEN print("---+---+---")
+  GREEN print(" " + str(b[3]) + " | " + str(b[4]) + " | " + str(b[5]))
+  GREEN print("---+---+---")
+  GREEN print(" " + str(b[6]) + " | " + str(b[7]) + " | " + str(b[8]))
 RED end
 
 GREEN func wins(b, m)
-YELLOW if b[0] == m and b[1] == m and b[2] == m
-GREEN return 1
-YELLOW elif b[3] == m and b[4] == m and b[5] == m
-GREEN return 1
-YELLOW elif b[6] == m and b[7] == m and b[8] == m
-GREEN return 1
-YELLOW elif b[0] == m and b[3] == m and b[6] == m
-GREEN return 1
-YELLOW elif b[1] == m and b[4] == m and b[7] == m
-GREEN return 1
-YELLOW elif b[2] == m and b[5] == m and b[8] == m
-GREEN return 1
-YELLOW elif b[0] == m and b[4] == m and b[8] == m
-GREEN return 1
-YELLOW elif b[2] == m and b[4] == m and b[6] == m
-GREEN return 1
-YELLOW else
-GREEN return 0
+  YELLOW if b[0] == m and b[1] == m and b[2] == m
+    GREEN return 1
+  YELLOW elif b[3] == m and b[4] == m and b[5] == m
+    GREEN return 1
+  YELLOW elif b[6] == m and b[7] == m and b[8] == m
+    GREEN return 1
+  YELLOW elif b[0] == m and b[3] == m and b[6] == m
+    GREEN return 1
+  YELLOW elif b[1] == m and b[4] == m and b[7] == m
+    GREEN return 1
+  YELLOW elif b[2] == m and b[5] == m and b[8] == m
+    GREEN return 1
+  YELLOW elif b[0] == m and b[4] == m and b[8] == m
+    GREEN return 1
+  YELLOW elif b[2] == m and b[4] == m and b[6] == m
+    GREEN return 1
+  YELLOW else
+    GREEN return 0
 RED end
 
 BLUE board = ['1','2','3','4','5','6','7','8','9']
@@ -41,23 +41,23 @@ BLUE turn = 0
 BLUE done = 0
 
 PURPLE while done == 0
-BLUE mark = get_mark(turn)
-GREEN display(board)
-GREEN print(mark + " — pick a square:")
-BLUE pos = int(input()) - 1
-BLUE w = 0
-YELLOW if board[pos] == 'X' or board[pos] == 'O'
-GREEN print("That square is already taken. Pick another one.")
-YELLOW else
-BLUE board = set_at(board, pos, mark)
-BLUE turn = turn + 1
-BLUE w = wins(board, mark)
-YELLOW if w == 1
-GREEN display(board)
-GREEN print(mark + " wins!")
-BLUE done = 1
-YELLOW elif turn == 9
-GREEN display(board)
-GREEN print("Draw!")
-BLUE done = 1
+  BLUE mark = get_mark(turn)
+  GREEN display(board)
+  GREEN print(mark + " — pick a square:")
+  BLUE pos = int(input()) - 1
+  BLUE w = 0
+  YELLOW if board[pos] == 'X' or board[pos] == 'O'
+    GREEN print("That square is already taken. Pick another one.")
+  YELLOW else
+    BLUE board = set_at(board, pos, mark)
+    BLUE turn = turn + 1
+    BLUE w = wins(board, mark)
+    YELLOW if w == 1
+      GREEN display(board)
+      GREEN print(mark + " wins!")
+      BLUE done = 1
+    YELLOW elif turn == 9
+      GREEN display(board)
+      GREEN print("Draw!")
+      BLUE done = 1
 RED end
