@@ -1,9 +1,8 @@
 // ChromaCode — hello_world.chroma
 // Simple Program 1: Hello World
-// Demonstrates: BLUE (variable), YELLOW (condition), GREEN (print), RED (end)
+// Demonstrates: BLUE (variable), YELLOW (condition), GREEN (print)
 
 BLUE name = "World"
 YELLOW if name != ""
 GREEN print("Hello, " + name + "!")
-RED end
 GREEN print("Welcome to ChromaCode.")
