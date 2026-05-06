@@ -2,6 +2,23 @@
 
 > A programming language where **color is syntax**, not decoration.
 
+## Run Sample Programs
+
+```bash
+python3 chromacode.py 'sample programs/hello_world.chroma'
+python3 chromacode.py 'sample programs/temp_converter.chroma'
+python3 chromacode.py 'sample programs/countdown.chroma'
+python3 chromacode.py 'sample programs/fizzbuzz.chroma'
+python3 chromacode.py 'sample programs/stats_calculator.chroma'
+printf '1\n1\n4\n2\n5\n3\n' | python3 chromacode.py 'sample programs/ttt.chroma'
+```
+
+**Requirements:** Python 3.10+ · No external dependencies
+
+For the image reader: `pip install Pillow`
+
+---
+
 ChromaCode is a dual-channel programming language: every line carries meaning through both its **text keyword** and its **color tag**. The color defines what kind of operation the line performs — enforced at parse time by the interpreter.
 
 ---
@@ -23,12 +40,8 @@ A **ColorTypeError** is thrown at parse time if a tag is misused — e.g., using
 ## Quick Start
 
 ```bash
-python3 chromacode.py fizzbuzz.chroma
+python3 chromacode.py 'sample programs/fizzbuzz.chroma'
 ```
-
-**Requirements:** Python 3.10+ · No external dependencies
-
-For the image reader: `pip install Pillow`
 
 ---
 
@@ -79,7 +92,7 @@ GREEN print("---+---+---")
 RED end
 
 BLUE board = ['1','2','3','4','5','6','7','8','9']
-PURPLE while done === 0
+PURPLE while done == 0
 GREEN display(board)
 BLUE pos = int(input()) - 1
 BLUE board = set_at(board, pos, mark)
@@ -207,7 +220,7 @@ Color blocks map to: BLUE · GREEN · YELLOW · PURPLE · RED
 
 ```bash
 # Run a .chroma file
-python3 chromacode.py fizzbuzz.chroma
+python3 chromacode.py 'sample programs/fizzbuzz.chroma'
 
 # Use as a module
 from chromacode import interpret_source
@@ -226,7 +239,13 @@ CS-420-Final/
 ├── chromacode.py          # Python interpreter (lexer + parser + AST + evaluator)
 ├── image_to_chroma.py     # Image strip reader and skeleton generator
 ├── index.html             # Website with browser-based JS interpreter
-├── fizzbuzz.chroma        # FizzBuzz sample (.chroma file)
+├── sample programs/       # Example .chroma programs
+│   ├── countdown.chroma
+│   ├── fizzbuzz.chroma
+│   ├── hello_world.chroma
+│   ├── stats_calculator.chroma
+│   ├── temp_converter.chroma
+│   └── ttt.chroma
 ├── .vscode/
 │   └── settings.json      # VS Code color overrides for .chroma files
 └── README.md
